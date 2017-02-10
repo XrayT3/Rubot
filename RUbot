@@ -3,7 +3,7 @@
 import telebot
 import datetime
 import time
-import const
+import RUconst
 from telebot import types
 
 bot = telebot.TeleBot(const.TOKEN)
