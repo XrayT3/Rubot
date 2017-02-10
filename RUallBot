@@ -1,0 +1,230 @@
+
+TOKEN = '323328748:AAGP75j8CmnniMK-lpp3n4PSW3IS0H0If_8'
+
+
+Pn = '📘Физика(27)\n' \
+     '📘Физика(27)/Математика(36)\n' \
+     '📐Математика(36)/Физика(27)\n' \
+     '⚽️Физ-ра(Спортзал)\n' \
+     '⚔История(31)\n' \
+     '⚔История(31)\n'
+
+Vt = '📘Физика(27)\n' \
+     '📘Физика(27)\n' \
+     '📖Лит-ра(42)\n' \
+     '🐢Биология(?)\n' \
+     '📐Математика(36)\n' \
+     '📐Математика(36)\n'
+
+Sr = '📐Математика(36)\n' \
+     '📐Математика(36)\n' \
+     '🇬🇧Англ.яз(?)\n' \
+     '🇬🇧Англ.яз(?)\n' \
+     '🇷🇺Русс.яз(42)\n' \
+     '🔬Химия(?)\n'
+
+Che = '📘Физика(27)\n' \
+      '📘Физика(27)\n' \
+      '⚖Обществознание(31)\n' \
+      '⚖Обществознание(31)\n' \
+      '🌎География\n' \
+      '🌎География\n' \
+      '🖥Информатика\n'
+
+Pt = '📐Математика(36)\n' \
+     '📐Математика(36)\n' \
+     '🇬🇧Англ.яз(?)\n' \
+     '🇷🇺Русс.яз(42)\n' \
+     '💾Информатика\n' \
+     '💾Информатика\n' \
+     '🏊🏼Физ-ра(Бассейн)\n'
+
+Su = '🏠ОБЖ\n' \
+     '📖Лит-ра(42)\n' \
+     '📖Лит-ра(42)\n' \
+     '⚽️Физ-ра(Спортзал)\n'
+
+Vsk = '<i> - Уроки на понедельник</i>\n'  \
+     '📘Физика(27)\n' \
+     '📘Физика(27)/Математика(36)\n' \
+     '📐Математика(36)/Физика(27)\n' \
+     '⚽️Физ-ра(Спортзал)\n' \
+     '⚔История(31)\n' \
+     '⚔История(31)\n'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#!/usr/bin/python3.4
+# -*- coding: utf-8 -*-
+import telebot
+import datetime
+import time
+from telebot import types
+
+bot = telebot.TeleBot(TOKEN)
+
+now_time = datetime.datetime.now()
+day = 'day'
+raspisanie = 'raspisanie'
+raspisanie2 = 'raspisanie2'
+tm = 'tm'
+month = 'month'
+hour = 'hour'
+minute = 'minute'
+
+
+#Блок, который отвечает за дату и время.
+def data_and_vremy():
+    now_time = datetime.datetime.now()
+    cur_hour = now_time.hour  # Час текущий
+    cur_minute = now_time.minute
+    month1 = {1: u"Января", 2: u"Февраля", 3: u"Марта", 4: u"Апреля", 5: u"Мая", 6: u"Июня", 7: u"Июля", 8: u'Августа',
+              9: u'Сентября', 10: u'Октября', 11: u'Ноября', 12: u'Декабрь'}
+    today = datetime.date.today()
+    month1 = str((month1[today.month]))
+    day1 = str(today.day)
+    days = {0: u"понедельник", 1: u"вторник", 2: u"среда", 3: u"четверг", 4: u"пятница", 5: u"суббота",
+            6: u"воскресенье"}
+    tm1 = (days[datetime.date.today().weekday()])
+    if tm1 == 'понедельник':
+        raspisanie1 = Pn
+        raspisanie3 = Vt
+    if tm1 == 'вторник':
+        raspisanie1 = Vt
+        raspisanie3 = Sr
+    if tm1 == 'среда':
+        raspisanie1 = Sr
+        raspisanie3 = Che
+    if tm1 == 'четверг':
+        raspisanie1 = Che
+        raspisanie3 = Pt
+    if tm1 == 'пятница':
+        raspisanie1 = Pt
+        raspisanie3 = Su
+    if tm1 == 'суббота':
+        raspisanie1 = Su
+        raspisanie3 = Vsk
+    if tm1 == 'воскресенье':
+        raspisanie1 = Vsk
+        raspisanie3 = Pn
+    global day, month, tm, raspisanie, raspisanie2, hour, minute
+    day = day1
+    month = month1
+    tm = tm1
+    raspisanie = raspisanie1
+    raspisanie2 = raspisanie3
+    hour = str(cur_hour)
+    minute = str(cur_minute)
+    return day1, month1, tm1, raspisanie1
+
+
+#///////////////////////////////////////////////////////////////////
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    sent = bot.send_message(message.chat.id, 'Как тебя зовут?')
+    bot.register_next_step_handler(sent, hello)
+
+
+def hello(message):
+    bot.send_message(message.chat.id, 'Привет, {name}. Рад тебя видеть.'.format(name=message.text))
+    time.sleep(1)
+    keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.row('🔔Звонки', '📚Уроки')
+    keyboard.row('📝Записать ДЗ')
+    # keyboard.add(*[telebot.types.KeyboardButton(name) for name in ['Олимпиады', 'Мероприятия']])
+    bot.send_message(message.chat.id, 'Что хочешь узнать?', reply_markup=keyboard)
+
+
+@bot.message_handler(content_types=['text'])
+def zvonki(message) :
+    keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(*[types.InlineKeyboardButton(text=name, callback_data=name) for name in ['Вторая смена']])
+    keyboard1 = types.InlineKeyboardMarkup()
+    keyboard1.add(*[types.InlineKeyboardButton(text=name, callback_data=name) for name in ['На завтра']])
+    keyboard2 = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard2.row('Что задали?', 'Помочь(в разработке)')
+    keyboard2.row('ГДЗ(в разработке)','Назад')
+    if message.text == '🔔Звонки':
+         bot.send_message(message.chat.id, '<b>Расписание звонков первой смены</b>\n\n'
+                                              '1. 08:00 - 08:40\n'
+                                              '2. 08:50 - 09:30\n'
+                                              '3. 09:45 - 10:25\n'
+                                              '4. 10:40 - 11:20\n'
+                                              '5. 11:35 - 12:15\n'
+                                              '6. 12:25 - 13:05\n', parse_mode='HTML', reply_markup=keyboard)
+
+    if message.text == 'Назад':
+            keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+            keyboard.row('🔔Звонки', '📚Уроки')
+            keyboard.row('📝Записать ДЗ')
+            # keyboard.add(*[telebot.types.KeyboardButton(name) for name in ['Олимпиады', 'Мероприятия']])
+            bot.send_message(message.chat.id, 'Что хочешь узнать?', parse_mode='HTML', reply_markup=keyboard)
+
+    if message.text == '📚Уроки':
+        data_and_vremy()
+        bot.send_message(message.chat.id,
+                             '<b>' + day + ' ' + month + ' ,' + tm + '</b>\n\n' +
+                             raspisanie, parse_mode='HTML', reply_markup= keyboard1)
+        bot.send_message(message.chat.id, '...', reply_markup= keyboard2)
+
+
+@bot.callback_query_handler(func=lambda c: True)
+def inline(c):
+    keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(*[types.InlineKeyboardButton(text=name, callback_data=name) for name in ['Первая смена']])
+    keyboard1 = types.InlineKeyboardMarkup()
+    keyboard1.add(*[types.InlineKeyboardButton(text=name, callback_data=name) for name in ['Вторая смена']])
+    keyboard2 = types.InlineKeyboardMarkup()
+    keyboard2.add(*[types.InlineKeyboardButton(text=name, callback_data=name) for name in ['На сегодня']])
+    keyboard3 = types.InlineKeyboardMarkup()
+    keyboard3.add(*[types.InlineKeyboardButton(text=name, callback_data=name) for name in ['На завтра']])
+    if c.data == 'Первая смена':
+        bot.edit_message_text(chat_id=c.message.chat.id, message_id=c.message.message_id,
+                                  text='<b>Расписание звонков первой смены</b>\n\n'
+                                       '1. 08:00 - 08:40\n'
+                                       '2. 08:50 - 09:30\n'
+                                       '3. 09:45 - 10:25\n'
+                                       '4. 10:40 - 11:20\n'
+                                       '5. 11:35 - 12:15\n'
+                                       '6. 12:25 - 13:05\n',
+                                  parse_mode='HTML', reply_markup=keyboard1)
+
+    if c.data == 'Вторая смена':
+        bot.edit_message_text(chat_id=c.message.chat.id, message_id=c.message.message_id,
+                                  text='<b>Расписание звонков второй смены</b>\n\n'
+                                       '1. 14:00 - 14:40\n'
+                                       '2. 14:50 - 15:30\n'
+                                       '3. 15:45 - 16:25\n'
+                                       '4. 16:35 - 17:15\n'
+                                       '5. 17:25 - 18:05\n'
+                                       '6. 18:10 - 18:50\n',
+                                  parse_mode='HTML', reply_markup=keyboard)
+
+    if c.data == 'На завтра':
+        bot.edit_message_text(chat_id=c.message.chat.id, message_id=c.message.message_id,
+                                  text='<b>' + day + ' ' + month + ' ,' + tm + '</b>\n\n' +
+                                  raspisanie2, parse_mode='HTML', reply_markup= keyboard2)
+
+    if c.data == 'На сегодня':
+        bot.edit_message_text(chat_id=c.message.chat.id, message_id=c.message.message_id,
+                                  text='<b>' + day + ' ' + month + ' ,' + tm + '</b>\n\n' +
+                                  raspisanie, parse_mode='HTML', reply_markup= keyboard3)
+
+
+
+bot.polling()
